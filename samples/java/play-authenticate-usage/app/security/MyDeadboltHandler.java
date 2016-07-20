@@ -20,6 +20,13 @@ public class MyDeadboltHandler extends AbstractDeadboltHandler {
 	public Promise<Optional<Result>> beforeAuthCheck(final Http.Context context) {
 		if (PlayAuthenticate.isLoggedIn(context.session())) {
 			// user is logged in
+			
+			if(User.findByAuthUserIdentity(PlayAuthenticate.getUser(context)).forcePasswordChange) {
+				// user has to set new password - no matter which restricted page he/she tries to access
+				if(!context.request().path().equals(controllers.routes.Account.changePassword().path())) {
+					return F.Promise.promise(() -> Optional.ofNullable(redirect(controllers.routes.Account.changePassword())));
+				}
+			}
 			return F.Promise.pure(Optional.empty());
 		} else {
 			// user is not logged in

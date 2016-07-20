@@ -51,6 +51,8 @@ public class User extends AppModel implements Subject {
 	public boolean active;
 
 	public boolean emailValidated;
+	
+	public boolean forcePasswordChange;
 
 	@ManyToMany
 	public List<SecurityRole> roles;
@@ -170,6 +172,7 @@ public class User extends AppModel implements Subject {
 		    user.lastName = lastName;
 		  }
 		}
+		user.forcePasswordChange = true;
 
 		user.save();
 		// Ebean.saveManyToManyAssociations(user, "roles");
@@ -237,6 +240,8 @@ public class User extends AppModel implements Subject {
 		}
 		a.providerUserId = authUser.getHashedPassword();
 		a.save();
+		this.forcePasswordChange = false;
+		this.save();
 	}
 
 	public void resetPassword(final UsernamePasswordAuthUser authUser,
