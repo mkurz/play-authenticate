@@ -1,6 +1,7 @@
 import java.util.Arrays;
 
 import models.SecurityRole;
+import models.User;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
@@ -12,6 +13,7 @@ import controllers.routes;
 import play.Application;
 import play.GlobalSettings;
 import play.mvc.Call;
+import play.mvc.Http;
 
 public class Global extends GlobalSettings {
 
@@ -29,7 +31,11 @@ public class Global extends GlobalSettings {
 			public Call afterAuth() {
 				// The user will be redirected to this page after authentication
 				// if no original URL was saved
-				return routes.Application.profile();
+				if(User.findByAuthUserIdentity(PlayAuthenticate.getUser(Http.Context.current())).forcePasswordChange) {
+					return routes.Application.profile();
+				} else {
+					return routes.Application.index();
+				}
 			}
 
 			@Override
